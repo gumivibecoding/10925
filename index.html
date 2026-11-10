@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주식 트레이더 나의공간 | Rainbow Quant & Trading Lab</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Pretendard', 'Noto Sans KR', 'sans-serif'],
+                    },
+                    colors: {
+                        darkBg: '#0b0f19',
+                        cardBg: '#131b2e',
+                    },
+                    animation: {
+                        'rainbow-glow': 'rainbow 6s linear infinite',
+                        'float': 'float 4s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        rainbow: {
+                            '0%, 100%': { 'filter': 'hue-rotate(0deg)' },
+                            '50%': { 'filter': 'hue-rotate(360deg)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for Portfolio & Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Rainbow Text Gradient */
+        .text-rainbow {
+            background: linear-gradient(135deg, #ff4b4b, #ffb800, #00e676, #00b0ff, #9c27b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% 200%;
+            animation: gradientMove 5s ease infinite;
+        }
+
+        .bg-rainbow-gradient {
+            background: linear-gradient(90deg, #ff0055, #ffaa00, #00e676, #00b0ff, #aa00ff);
+        }
+
+        .border-rainbow {
+            border-image: linear-gradient(90deg, #ff0055, #ffaa00, #00e676, #00b0ff, #aa00ff) 1;
+        }
+
+        .rainbow-shadow {
+            box-shadow: 0 10px 30px -10px rgba(0, 176, 255, 0.3),
+                        0 0 20px -5px rgba(255, 0, 85, 0.2);
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #ff0055, #00b0ff);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-darkBg text-slate-100 antialiased selection:bg-pink-500 selection:text-white font-sans min-h-screen flex flex-col">
+
+    <!-- Top Stock Ticker Bar -->
+    <div class="bg-slate-950 border-b border-slate-800/80 py-1.5 overflow-hidden text-xs text-slate-400 select-none">
+        <div class="flex items-center space-x-8 animate-marquee whitespace-nowrap px-4 justify-around">
+            <span class="inline-flex items-center gap-1.5"><i class="fa-solid font-bold text-emerald-400 fa-arrow-trend-up"></i> KOSPI <span class="text-emerald-400 font-semibold">2,745.20 (+1.24%)</span></span>
+            <span class="inline-flex items-center gap-1.5"><i class="fa-solid font-bold text-emerald-400 fa-arrow-trend-up"></i> NASDAQ <span class="text-emerald-400 font-semibold">17,890.15 (+0.85%)</span></span>
+            <span class="inline-flex items-center gap-1.5"><i class="fa-solid font-bold text-rose-400 fa-arrow-trend-down"></i> S&P 500 <span class="text-rose-400 font-semibold">5,450.30 (-0.12%)</span></span>
+            <span class="inline-flex items-center gap-1.5"><i class="fa-solid font-bold text-emerald-400 fa-arrow-trend-up"></i> RAINBOW QUANT SCORE <span class="text-rainbow font-bold">98.4 (Strong Buy)</span></span>
+            <span class="inline-flex items-center gap-1.5 hidden md:inline-flex"><i class="fa-solid text-amber-400 fa-coins"></i> BITCOIN <span class="text-amber-400 font-semibold">$64,320 (+2.10%)</span></span>
+        </div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-darkBg/80 border-b border-slate-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo & Title -->
+                <a href="#hero" class="flex items-center space-x-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 via-emerald-400 to-blue-500 p-0.5 shadow-lg group-hover:rotate-6 transition-transform">
+                        <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+                            <i class="fa-solid fa-chart-line text-rainbow text-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-lg font-black tracking-tight text-rainbow">주식 트레이더 나의공간</span>
+                        <span class="block text-[10px] text-slate-400 tracking-wider uppercase font-medium">Rainbow Trader Portfolio</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation Menu -->
+                <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
+                    <a href="#about" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-user-gear text-amber-400"></i> 1. 소개
+                    </a>
+                    <a href="#portfolio" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-briefcase text-emerald-400"></i> 2. 포트폴리오
+                    </a>
+                    <a href="#quiz" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-brain text-sky-400"></i> 3. 진로 퀴즈
+                    </a>
+                    <a href="#guestbook" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-comments text-purple-400"></i> 4. 방명록
+                    </a>
+                </nav>
+
+                <!-- Quick Action CTA -->
+                <div class="hidden sm:flex items-center space-x-3">
+                    <a href="#quiz" class="px-4 py-2 rounded-full text-xs font-bold text-white bg-gradient-to-r from-red-500 via-amber-500 via-emerald-500 via-sky-500 to-purple-500 hover:opacity-90 transition-opacity shadow-lg shadow-sky-500/10">
+                        <i class="fa-solid fa-bolt mr-1"></i> 트레이더 성향 테스트
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobileMenuBtn" type="button" class="text-slate-400 hover:text-white p-2 rounded-lg focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile dropdown menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
+            <a href="#about" class="block px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 font-medium">1. 소개 (학습 이력, 관심 분야)</a>
+            <a href="#portfolio" class="block px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 font-medium">2. 포트폴리오 (프로젝트 3종)</a>
+            <a href="#quiz" class="block px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 font-medium">3. 진로 퀴즈 (트레이딩 성향)</a>
+            <a href="#guestbook" class="block px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 font-medium">4. 방명록 (소통 공간)</a>
+        </div>
+
+        <!-- Animated Rainbow Progress Bar Under Nav -->
+        <div class="h-[2px] w-full bg-rainbow-gradient opacity-80"></div>
+    </header>
+
+    <main class="flex-grow">
+        <!-- HERO SECTION -->
+        <section id="hero" class="relative py-16 md:py-24 overflow-hidden border-b border-slate-800/60">
+            <!-- Background Glow Effects -->
+            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-tr from-purple-600/20 via-sky-500/20 to-pink-500/20 rounded-full blur-3xl -z-10"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    
+                    <!-- Left Hero Content -->
+                    <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/80 text-xs font-medium text-slate-300">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                            <span class="text-rainbow font-semibold">데이터 & 백테스팅 중심의 트레이더</span>
+                        </div>
+
+                        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-white">
+                            수학적 분석과 기술로 <br class="hidden sm:block"/>
+                            <span class="text-rainbow">시장의 무지개빛 흐름</span>을 읽다
+                        </h1>
+
+                        <p class="text-slate-400 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                            안녕하세요! 차트 기술적 분석, 퀀트 알고리즘 개발, 감성 분석 스크리너 연구를 진행하는 주식 트레이더의 개인 연구 공간에 오신 것을 환영합니다.
+                        </p>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-wrap gap-4 justify-center lg:justify-start pt-2">
+                            <a href="#portfolio" class="px-6 py-3 rounded-xl font-bold text-slate-900 bg-gradient-to-r from-amber-400 via-emerald-400 to-sky-400 hover:brightness-110 transition shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+                                <i class="fa-solid fa-cubes"></i> 포트폴리오 보기
+                            </a>
+                            <a href="#quiz" class="px-6 py-3 rounded-xl font-bold text-slate-200 bg-slate-800/90 border border-slate-700 hover:border-slate-500 hover:text-white transition flex items-center gap-2">
+                                <i class="fa-solid fa-gamepad text-purple-400"></i> 진로/성향 퀴즈 풀기
+                            </a>
+                        </div>
+
+                        <!-- Highlights Badge Row -->
+                        <div class="pt-6 grid grid-cols-3 gap-4 border-t border-slate-800/80 max-w-lg mx-auto lg:mx-0 text-center">
+                            <div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800">
+                                <p class="text-xs text-slate-400">학습 이력</p>
+                                <p class="text-lg font-bold text-amber-400">3+ 년차</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800">
+                                <p class="text-xs text-slate-400">핵심 프로젝트</p>
+                                <p class="text-lg font-bold text-emerald-400">3 Major</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800">
+                                <p class="text-xs text-slate-400">트레이딩 스타일</p>
+                                <p class="text-lg font-bold text-sky-400">Quant & Swing</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Hero Interactive Chart Display -->
+                    <div class="lg:col-span-5">
+                        <div class="relative bg-cardBg rounded-2xl border border-slate-800 p-5 shadow-2xl overflow-hidden">
+                            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                                    <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                                    <span class="ml-2 text-xs font-mono text-slate-400">RAINBOW_QUANT_SIMULATOR.py</span>
+                                </div>
+                                <span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                    LIVE SIMULATION
+                                </span>
+                            </div>
+
+                            <!-- Live Chart Canvas Container -->
+                            <div class="relative h-64 w-full">
+                                <canvas id="heroChart"></canvas>
+                            </div>
+
+                            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs text-slate-400 font-mono">
+                                <span>전략: Rainbow Momentum Alpha</span>
+                                <span class="text-emerald-400 font-bold"><i class="fa-solid fa-arrow-up"></i> 누적수익률 +42.8%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- MENU 1: 소개 (학습 이력, 관심 분야) -->
+        <section id="about" class="py-20 border-b border-slate-800/60 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Title -->
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-xs font-bold tracking-widest text-amber-400 uppercase bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">MENU 01</span>
+                    <h2 class="text-3xl sm:text-4xl font-black text-white mt-3">
+                        트레이더 <span class="text-rainbow">소개 & 학습 이력</span>
+                    </h2>
+                    <p class="text-slate-400 mt-2 text-sm sm:text-base">
+                        금융 시장을 정복하기 위해 탄탄히 쌓아온 학습 파이프라인과 트레이딩 연구 관심 분야를 소개합니다.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    
+                    <!-- Left: Learning History Timeline -->
+                    <div class="lg:col-span-7 bg-cardBg/60 rounded-2xl border border-slate-800 p-6 sm:p-8">
+                        <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                            <i class="fa-solid fa-graduation-cap text-amber-400"></i> 주식 & 퀀트 학습 이력 (Learning History)
+                        </h3>
+
+                        <div class="relative border-l-2 border-slate-800 pl-6 space-y-8 my-2">
+                            
+                            <!-- Timeline Item 1 -->
+                            <div class="relative group">
+                                <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-red-500 border-4 border-slate-900 group-hover:scale-125 transition-transform"></div>
+                                <span class="text-xs font-mono px-2 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-semibold">2022 ~ 2023</span>
+                                <h4 class="text-base font-bold text-slate-100 mt-1">입문 및 기술적 분석(Technical Analysis) 마스터</h4>
+                                <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                                    캔들 패턴, 이동평균선 다이버전스, RSI/MACD 보조지표, 볼린저 밴드 매매법 수립. 한국거래소(KRX) 기본 주식 거래 메커니즘 및 호가창 체결 구조 심층 학습.
+                                </p>
+                                <div class="flex flex-wrap gap-1.5 mt-2">
+                                    <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">차트분석</span>
+                                    <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">캔들패턴</span>
+                                    <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">리스크관리</span>
+                                </div>
+                            </div>
+
+                            <!-- Timeline Item 2 -->
+                            <div class="relative group">
+                                <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-amber-400 border-4 border-slate-900 group-hover:scale-125 transition-transform"></div>
+                                <span class="text-xs font-mono px-2 py-0.5 rounded bg-amber-400/10 text-amber-400 border border-amber-400/20 font-semibold">2023 ~ 2024</span>
+                                <h4 class="text-base font-bold text-slate-100 mt-1">파이썬 퀀트 트레이딩 & 자동매매 구축</h4>
+                                <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                                    `Backtrader`, `PyAlgoTrade` 라이브러리를 활용한 모멘텀 및 팩터 투자 알고리즘 백테스팅. Open API(키움/한국투자증권) 연동 자동주문 봇 스크립트 제작.
+                                </p>
+                                <div class="flex flex-wrap gap-1.5 mt-2">
+                                    <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Python</span>
+                                    <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Backtrader</span>
+                                    <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Broker API</span>
+                                </div>
+                            </div>
+
+                            <!-- Timeline Item 3 -->
+                            <div class="relative group">
+                                <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-emerald-400 border-4 border-slate-900 group-hover:scale-125 transition-transform"></div>
+                                <span class="text-xs font-mono px-2 py-0.5 rounded bg-emerald-400/10 text-emerald-400 border border-emerald-400/20 font-semibold">2024 ~ 현재</span>
+                                <h4 class="text-base font-bold text-slate-100 mt-1">AI 머신러닝 감성분석 & 포트폴리오 최적화</h4>
+                                <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                                    뉴스 증권 기사 NLP Natural Language Processing 감성분석 지표 연동. Markowitz 포트폴리오 이론 기반 Sharpe Ratio 극대화 및 MDD(Maximum Drawdown) 방어 전략 연구.
+                                </p>
+                                <div class="flex flex-wrap gap-1.5 mt-2">
+                                    <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">AI/NLP</span>
+                                    <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Portfolio Optimization</span>
+                                    <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">PyTorch</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Right: Areas of Interest Grid & Skill Radar -->
+                    <div class="lg:col-span-5 space-y-6">
+                        
+                        <!-- Interests Card Box -->
+                        <div class="bg-cardBg/60 rounded-2xl border border-slate-800 p-6 sm:p-8">
+                            <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                                <i class="fa-solid fa-compass text-sky-400"></i> 트레이딩 관심 분야 (Areas of Interest)
+                            </h3>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                
+                                <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-red-500/50 transition">
+                                    <div class="w-8 h-8 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center mb-3">
+                                        <i class="fa-solid fa-bolt"></i>
+                                    </div>
+                                    <h5 class="text-sm font-bold text-white">퀀트 모멘텀 전략</h5>
+                                    <p class="text-xs text-slate-400 mt-1">상상 강도 지수 기반 종목 스크리닝 및 자동 리밸런싱</p>
+                                </div>
+
+                                <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-amber-500/50 transition">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center mb-3">
+                                        <i class="fa-solid fa-globe"></i>
+                                    </div>
+                                    <h5 class="text-sm font-bold text-white">매크로 & 섹터 로테이션</h5>
+                                    <p class="text-xs text-slate-400 mt-1">금리/환율/인플레이션 지표 연동 테마주/주도주 포착</p>
+                                </div>
+
+                                <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-emerald-500/50 transition">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-3">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                    </div>
+                                    <h5 class="text-sm font-bold text-white">손실 제한 & MDD 관리</h5>
+                                    <p class="text-xs text-slate-400 mt-1">Kelly Criterion 자금관리 알고리즘으로 자산 보호</p>
+                                </div>
+
+                                <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/50 transition">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center mb-3">
+                                        <i class="fa-solid fa-robot"></i>
+                                    </div>
+                                    <h5 class="text-sm font-bold text-white">AI 크롤링 & 감성분석</h5>
+                                    <p class="text-xs text-slate-400 mt-1">공시, 실적 발표, 토론방 센티멘트 실시간 지수화</p>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Skill Capability Overview -->
+                        <div class="bg-cardBg/60 rounded-2xl border border-slate-800 p-6">
+                            <h4 class="text-sm font-bold text-slate-300 mb-3 flex items-center justify-between">
+                                <span>트레이더 역량 매트릭스</span>
+                                <span class="text-xs text-emerald-400 font-mono">Overall Score: 94%</span>
+                            </h4>
+                            <div class="space-y-3 text-xs">
+                                <div>
+                                    <div class="flex justify-between mb-1 text-slate-400">
+                                        <span>기술적 차트 분석 (Technical Analysis)</span>
+                                        <span class="text-amber-400 font-bold">92%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-800 rounded-full h-2">
+                                        <div class="bg-amber-400 h-2 rounded-full" style="width: 92%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1 text-slate-400">
+                                        <span>파이썬 알고리즘 개발 (Python Algorithmic Trading)</span>
+                                        <span class="text-emerald-400 font-bold">88%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-800 rounded-full h-2">
+                                        <div class="bg-emerald-400 h-2 rounded-full" style="width: 88%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1 text-slate-400">
+                                        <span>리스크 관리 & 자산 배분 (Risk Management)</span>
+                                        <span class="text-sky-400 font-bold">95%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-800 rounded-full h-2">
+                                        <div class="bg-sky-400 h-2 rounded-full" style="width: 95%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- MENU 2: 포트폴리오 (프로젝트 3가지) -->
+        <section id="portfolio" class="py-20 border-b border-slate-800/60 bg-slate-950/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header -->
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-xs font-bold tracking-widest text-emerald-400 uppercase bg-emerald-400/10 px-3 py-1 rounded-full border border-emerald-400/20">MENU 02</span>
+                    <h2 class="text-3xl sm:text-4xl font-black text-white mt-3">
+                        핵심 <span class="text-rainbow">트레이딩 포트폴리오</span> (3 Major Projects)
+                    </h2>
+                    <p class="text-slate-400 mt-2 text-sm sm:text-base">
+                        직접 설계하고 검증한 3가지 핵심 시스템입니다. 각 카드 클릭 시 상세 데모 시뮬레이션을 확인할 수 있습니다.
+                    </p>
+                </div>
+
+                <!-- 3 Portfolio Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    <!-- PROJECT 1 CARD -->
+                    <div class="bg-cardBg rounded-2xl border border-slate-800 overflow-hidden hover:border-red-500/50 transition-all duration-300 flex flex-col group">
+                        <div class="h-48 bg-gradient-to-br from-slate-900 to-slate-950 p-5 relative border-b border-slate-800 flex flex-col justify-between overflow-hidden">
+                            <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#ff0055_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                            <div class="flex justify-between items-start z-10">
+                                <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30">PROJECT 01</span>
+                                <i class="fa-solid fa-chart-line text-2xl text-slate-600 group-hover:text-red-400 transition-colors"></i>
+                            </div>
+                            <div class="z-10">
+                                <span class="text-xs text-slate-400">Python / Backtrader / KOSPI</span>
+                                <h3 class="text-lg font-bold text-white mt-0.5">RainbowQuant 자동매매 시스템</h3>
+                            </div>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                추세추종 듀얼 모멘텀 전략 및 볼린저 밴드 스퀴즈 신호를 결합한 파이썬 자동주문 매매 엔진. 연평균 수익률(CAGR) +28.5% 기록.
+                            </p>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-400">백테스팅 기간:</span>
+                                    <span class="text-slate-200 font-semibold">2019 - 2024 (5년)</span>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-400">최대 낙폭 (MDD):</span>
+                                    <span class="text-emerald-400 font-semibold">-8.2% (강력 방어)</span>
+                                </div>
+                            </div>
+                            <button onclick="openModal('modal1')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 hover:text-white transition border border-slate-700 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-eye text-red-400"></i> 프로젝트 상세 & 결과 보기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PROJECT 2 CARD -->
+                    <div class="bg-cardBg rounded-2xl border border-slate-800 overflow-hidden hover:border-amber-500/50 transition-all duration-300 flex flex-col group">
+                        <div class="h-48 bg-gradient-to-br from-slate-900 to-slate-950 p-5 relative border-b border-slate-800 flex flex-col justify-between overflow-hidden">
+                            <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#ffb800_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                            <div class="flex justify-between items-start z-10">
+                                <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">PROJECT 02</span>
+                                <i class="fa-solid fa-newspaper text-2xl text-slate-600 group-hover:text-amber-400 transition-colors"></i>
+                            </div>
+                            <div class="z-10">
+                                <span class="text-xs text-slate-400">NLP / PyTorch / Web Scraping</span>
+                                <h3 class="text-lg font-bold text-white mt-0.5">SentiStock AI 뉴스 감성 스크리너</h3>
+                            </div>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                매일 10,000건 이상의 증권 뉴스 및 텔레그램 공시를 실시간 크롤링하여 긍정/부정 감성 점수를 도출, 급등 유망 종목 포착.
+                            </p>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-400">처리 뉴스량:</span>
+                                    <span class="text-slate-200 font-semibold">일 10,000+ 건</span>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-400">감성 도출 정확도:</span>
+                                    <span class="text-amber-400 font-semibold">89.4%</span>
+                                </div>
+                            </div>
+                            <button onclick="openModal('modal2')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 hover:text-white transition border border-slate-700 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-eye text-amber-400"></i> 스크리너 데모 보기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PROJECT 3 CARD -->
+                    <div class="bg-cardBg rounded-2xl border border-slate-800 overflow-hidden hover:border-sky-500/50 transition-all duration-300 flex flex-col group">
+                        <div class="h-48 bg-gradient-to-br from-slate-900 to-slate-950 p-5 relative border-b border-slate-800 flex flex-col justify-between overflow-hidden">
+                            <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#00b0ff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                            <div class="flex justify-between items-start z-10">
+                                <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30">PROJECT 03</span>
+                                <i class="fa-solid fa-shield-virus text-2xl text-slate-600 group-hover:text-sky-400 transition-colors"></i>
+                            </div>
+                            <div class="z-10">
+                                <span class="text-xs text-slate-400">JavaScript / Chart.js / Risk API</span>
+                                <h3 class="text-lg font-bold text-white mt-0.5">RiskGuard 대쉬보드 & 스트레스 테스터</h3>
+                            </div>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                금리 인상, 시장 급락 등 외부 쇼크 발생 시 보유 포트폴리오의 손실율을 실시간 시뮬레이션하고 변동성을 최적화하는 리스크 대시보드.
+                            </p>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-400">지원 시나리오:</span>
+                                    <span class="text-slate-200 font-semibold">시장의 5대 폭락장 모델링</span>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-400">VaR 계산:</span>
+                                    <span class="text-sky-400 font-semibold">99% 신뢰구간 측정</span>
+                                </div>
+                            </div>
+                            <button onclick="openModal('modal3')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 hover:text-white transition border border-slate-700 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-eye text-sky-400"></i> 대시보드 리액티브 보기
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- MENU 3: 진로 퀴즈 (방문자 참여용) -->
+        <section id="quiz" class="py-20 border-b border-slate-800/60 relative overflow-hidden">
+            <!-- Decorative Glow Background -->
+            <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header -->
+                <div class="text-center max-w-2xl mx-auto mb-12">
+                    <span class="text-xs font-bold tracking-widest text-sky-400 uppercase bg-sky-400/10 px-3 py-1 rounded-full border border-sky-400/20">MENU 03</span>
+                    <h2 class="text-3xl sm:text-4xl font-black text-white mt-3">
+                        나의 <span class="text-rainbow">주식 트레이더 진로/성향 퀴즈</span> 🎯
+                    </h2>
+                    <p class="text-slate-400 mt-2 text-xs sm:text-sm">
+                        5가지 핵심 질문에 답하고, 내 성향에 딱 맞는 트레이딩 진로와 투자 스타일 유형을 진단해보세요!
+                    </p>
+                </div>
+
+                <!-- Quiz Container Card -->
+                <div class="bg-cardBg rounded-2xl border border-slate-800 p-6 sm:p-10 shadow-2xl relative">
+                    
+                    <!-- Progress Bar Header -->
+                    <div id="quizProgressContainer" class="mb-8">
+                        <div class="flex justify-between items-center text-xs text-slate-400 font-mono mb-2">
+                            <span id="quizStepText">질문 1 / 5</span>
+                            <span id="quizPercentText" class="text-sky-400 font-bold">20% 완료</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <div id="quizProgressBar" class="h-full bg-rainbow-gradient transition-all duration-300" style="width: 20%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Container -->
+                    <div id="quizQuestionBox" class="space-y-6">
+                        <!-- Dynamic Question Header injected by JS -->
+                        <h3 id="questionTitle" class="text-lg sm:text-xl font-bold text-slate-100">
+                            질문 로딩 중...
+                        </h3>
+
+                        <!-- Dynamic Answers List -->
+                        <div id="quizAnswersContainer" class="space-y-3">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Quiz Result Container (Hidden by default) -->
+                    <div id="quizResultBox" class="hidden text-center space-y-6 py-4">
+                        <div class="inline-flex p-4 rounded-full bg-gradient-to-tr from-amber-500/20 to-purple-500/20 border border-slate-700">
+                            <i id="resultIcon" class="fa-solid fa-trophy text-4xl text-amber-400"></i>
+                        </div>
+
+                        <div>
+                            <span class="text-xs font-mono uppercase text-slate-400 tracking-wider">YOUR TRADER TYPE</span>
+                            <h3 id="resultTitle" class="text-2xl sm:text-3xl font-black text-rainbow mt-1">
+                                냉철한 수학자 - 퀀트 트레이더
+                            </h3>
+                        </div>
+
+                        <p id="resultDesc" class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl mx-auto bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+                            당신은 감정에 휘둘리지 않고 데이터와 백테스팅 결과를 철저히 신뢰하는 퀀트 트레이딩 스타일입니다. 알고리즘 개발 및 리스크 방어에 뛰어난 자질을 가지고 있습니다!
+                        </p>
+
+                        <!-- Recommended Learning Path & Traits -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left max-w-lg mx-auto">
+                            <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 text-xs">
+                                <span class="font-bold text-amber-400 block mb-1">🔑 추천 학습 로드맵</span>
+                                <span id="resultRoadmap" class="text-slate-400">Python 데이터분석 + Backtrader + 팩터투자</span>
+                            </div>
+                            <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 text-xs">
+                                <span class="font-bold text-emerald-400 block mb-1">⚡ 핵심 트레이딩 강점</span>
+                                <span id="resultStrength" class="text-slate-400">손절매 규율 엄수 & 높은 리스크 관리</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-3 justify-center pt-4">
+                            <button onclick="resetQuiz()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition border border-slate-700">
+                                <i class="fa-solid fa-rotate-right mr-1"></i> 다시 테스트하기
+                            </button>
+                            <a href="#guestbook" onclick="prefillGuestbookTag()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-sky-500 text-xs font-bold text-slate-950 hover:brightness-110 transition shadow-lg">
+                                <i class="fa-solid fa-pen-to-square mr-1"></i> 방명록에 내 결과 남기기
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- MENU 4: 방명록 (소통공간) -->
+        <section id="guestbook" class="py-20 bg-slate-950">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header -->
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-xs font-bold tracking-widest text-purple-400 uppercase bg-purple-400/10 px-3 py-1 rounded-full border border-purple-400/20">MENU 04</span>
+                    <h2 class="text-3xl sm:text-4xl font-black text-white mt-3">
+                        방문자 <span class="text-rainbow">소통 공간 & 방명록</span> 💬
+                    </h2>
+                    <p class="text-slate-400 mt-2 text-sm sm:text-base">
+                        트레이더 공간에 오신 것을 환영합니다! 응원 메시지나 종목 의견, 퀴즈 결과 소감을 자유롭게 공유해주세요.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    
+                    <!-- Left: Guestbook Input Form -->
+                    <div class="lg:col-span-5">
+                        <div class="bg-cardBg rounded-2xl border border-slate-800 p-6 sticky top-24 shadow-xl">
+                            <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-paper-plane text-purple-400"></i> 방명록 작성하기
+                            </h3>
+
+                            <form id="guestbookForm" onsubmit="handleGuestbookSubmit(event)" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-1">닉네임 / 성함</label>
+                                    <input type="text" id="gbName" required placeholder="예: 무지개트레이더" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-slate-100 focus:outline-none focus:border-purple-500 transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-1">투자 성향 / 태그</label>
+                                    <select id="gbTag" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-slate-100 focus:outline-none focus:border-purple-500 transition">
+                                        <option value="⚡ 단타 스캘퍼">⚡ 단타 스캘퍼</option>
+                                        <option value="📊 차트 스윙 트레이더" selected>📊 차트 스윙 트레이더</option>
+                                        <option value="🧠 퀀트/알고리즘">🧠 퀀트/알고리즘</option>
+                                        <option value="🛡️ 장기/가치 투자자">🛡️ 장기/가치 투자자</option>
+                                        <option value="🌟 탐방자 / 응원">🌟 탐방자 / 응원</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-1">아바타 아이콘 선택</label>
+                                    <div class="flex gap-2" id="avatarSelector">
+                                        <button type="button" onclick="selectAvatar('🚀')" class="avatar-btn w-9 h-9 rounded-lg bg-slate-900 border border-purple-500 text-base">🚀</button>
+                                        <button type="button" onclick="selectAvatar('📈')" class="avatar-btn w-9 h-9 rounded-lg bg-slate-900 border border-slate-800 text-base">📈</button>
+                                        <button type="button" onclick="selectAvatar('🤖')" class="avatar-btn w-9 h-9 rounded-lg bg-slate-900 border border-slate-800 text-base">🤖</button>
+                                        <button type="button" onclick="selectAvatar('💎')" class="avatar-btn w-9 h-9 rounded-lg bg-slate-900 border border-slate-800 text-base">💎</button>
+                                        <button type="button" onclick="selectAvatar('🌈')" class="avatar-btn w-9 h-9 rounded-lg bg-slate-900 border border-slate-800 text-base">🌈</button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-1">메시지 내용</label>
+                                    <textarea id="gbMessage" rows="3" required placeholder="좋은 프로젝트 잘 보고 갑니다! 퀀트 매매 응원합니다." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-slate-100 focus:outline-none focus:border-purple-500 transition resize-none"></textarea>
+                                </div>
+
+                                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white font-bold text-xs uppercase tracking-wider hover:opacity-95 transition shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-paper-plane"></i> 방명록 등록하기
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Right: Message List Cards -->
+                    <div class="lg:col-span-7 space-y-4">
+                        
+                        <!-- List Filter & Stats -->
+                        <div class="flex items-center justify-between bg-cardBg/50 p-4 rounded-xl border border-slate-800 text-xs">
+                            <span class="text-slate-400">총 작성된 메시지: <span id="totalGbCount" class="text-purple-400 font-bold">3</span>개</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-500">정렬:</span>
+                                <button onclick="sortGuestbook('newest')" class="text-slate-300 hover:text-white font-semibold">최신순</button>
+                                <span class="text-slate-700">|</span>
+                                <button onclick="sortGuestbook('likes')" class="text-slate-400 hover:text-white">좋아요순</button>
+                            </div>
+                        </div>
+
+                        <!-- Messages Container -->
+                        <div id="guestbookList" class="space-y-4">
+                            <!-- Injected by JavaScript -->
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- PORTFOLIO MODALS -->
+    
+    <!-- Modal 1: RainbowQuant -->
+    <div id="modal1" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-cardBg border border-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative shadow-2xl">
+            <button onclick="closeModal('modal1')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <span class="text-xs font-mono text-red-400 bg-red-500/10 px-2.5 py-1 rounded border border-red-500/20">PROJECT 01 DETAIL</span>
+            <h3 class="text-2xl font-bold text-white mt-2">RainbowQuant 자동매매 알고리즘</h3>
+            <p class="text-xs text-slate-400 mt-1">파이썬 기반 추세 추종 & 다단계 손절 모듈 적용 시스템</p>
+            
+            <div class="my-5 border-t border-b border-slate-800 py-4 space-y-3 text-xs text-slate-300">
+                <h4 class="font-bold text-amber-400">핵심 기능 구현</h4>
+                <ul class="list-disc pl-5 space-y-1.5 text-slate-400">
+                    <li>KOSPI200 및 코스닥 상위 100개 종목 대상 이동평균선(20, 60, 120일) 골든크로스 정밀 포착</li>
+                    <li>RSI 지표와 볼린저 밴드 상단 돌파 시 동시 매수 신호 발생 (이중 검증 메커니즘)</li>
+                    <li>Trailing Stop 손절 기능: 최고가 대비 -3.5% 하락 시 자동 익절/손절 매도 주문 발송</li>
+                    <li>Telegram API와 연동하여 실시간 체결 내역 및 일간 수익률 리포트 자동 전송</li>
+                </ul>
+            </div>
+
+            <div class="p-4 bg-slate-900 rounded-xl border border-slate-800">
+                <p class="text-xs font-mono text-emerald-400 font-bold mb-2">백테스팅 성능 결과 요약</p>
+                <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                    <div class="p-2 bg-slate-950 rounded">
+                        <span class="text-slate-500 block text-[10px]">총 수익률</span>
+                        <span class="text-emerald-400 font-bold text-sm">+142.5%</span>
+                    </div>
+                    <div class="p-2 bg-slate-950 rounded">
+                        <span class="text-slate-500 block text-[10px]">승률 (Win Rate)</span>
+                        <span class="text-amber-400 font-bold text-sm">64.2%</span>
+                    </div>
+                    <div class="p-2 bg-slate-950 rounded">
+                        <span class="text-slate-500 block text-[10px]">Sharpe Ratio</span>
+                        <span class="text-sky-400 font-bold text-sm">1.82</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeModal('modal1')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: SentiStock -->
+    <div id="modal2" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-cardBg border border-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative shadow-2xl">
+            <button onclick="closeModal('modal2')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <span class="text-xs font-mono text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded border border-amber-500/20">PROJECT 02 DETAIL</span>
+            <h3 class="text-2xl font-bold text-white mt-2">SentiStock AI 뉴스 감성 스크리너</h3>
+            <p class="text-xs text-slate-400 mt-1">자연어 처리(NLP)와 증권 뉴스 긍부정 감성지수 시각화</p>
+
+            <div class="my-5 border-t border-b border-slate-800 py-4 space-y-3 text-xs text-slate-300">
+                <h4 class="font-bold text-sky-400">스크리너 동작 원리</h4>
+                <ul class="list-disc pl-5 space-y-1.5 text-slate-400">
+                    <li>BeautifulSoup 및 Selenium 기반 네이버 증권, 연합인포맥스 뉴스 실시간 수집</li>
+                    <li>KoBERT 및 증권 특화 딕셔너리로 키워드(실적발표, 수주, 신제품, 흑자전환) 감성 스코어링</li>
+                    <li>급격한 감성 스코어 상승(+80점 이상) 감지 시 해당 종목 거래량 변동률 동시 비교</li>
+                </ul>
+            </div>
+
+            <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 text-xs">
+                <span class="text-slate-300 font-bold block mb-2">실시간 포착 샘플 예시</span>
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center p-2 bg-slate-950 rounded">
+                        <span>[삼성전자] 차세대 반도체 공급 계약 체결...</span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">+92점 (매수우수)</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2 bg-slate-950 rounded">
+                        <span>[OO기업] 3분기 영업이익 전년비 감소...</span>
+                        <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold">-68점 (주의)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeModal('modal2')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: RiskGuard -->
+    <div id="modal3" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-cardBg border border-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative shadow-2xl">
+            <button onclick="closeModal('modal3')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <span class="text-xs font-mono text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded border border-sky-500/20">PROJECT 03 DETAIL</span>
+            <h3 class="text-2xl font-bold text-white mt-2">RiskGuard 포트폴리오 리스크 대시보드</h3>
+            <p class="text-xs text-slate-400 mt-1">Monte Carlo 시뮬레이션 및 포트폴리오 충격 테스트</p>
+
+            <div class="my-5 border-t border-b border-slate-800 py-4 space-y-3 text-xs text-slate-300">
+                <h4 class="font-bold text-purple-400">스트레스 테스터 기능</h4>
+                <p class="text-slate-400 leading-relaxed">
+                    역사적 위기 상황(2008 금융위기, 2020 팬데믹 급락장) 데이터를 기반으로 현재 포트폴리오의 예상 손실액(Value at Risk)을 시뮬레이션하고 상관관계가 낮은 자산(금, 달러, 채권)의 최적 배분 비중을 제시합니다.
+                </p>
+            </div>
+
+            <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 text-xs text-slate-300">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-bold">시뮬레이션 추천 가이드</span>
+                    <span class="text-sky-400">Sharpe Ratio: 2.1</span>
+                </div>
+                <p class="text-slate-400">주식 60% + 국채 25% + 원자재/금 15% 조합 시 시장 폭락 시에도 최대 하락폭 -6.5% 이내로 방어 가능.</p>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeModal('modal3')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 border-t border-slate-800/80 py-10 text-slate-500 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-rainbow-gradient animate-pulse"></span>
+                <span class="font-bold text-slate-300 text-sm">주식 트레이더 나의공간</span>
+                <span>© 2026 Rainbow Trading Lab. All rights reserved.</span>
+            </div>
+
+            <div class="flex space-x-4 text-base text-slate-400">
+                <a href="#" class="hover:text-rainbow transition"><i class="fa-brands fa-github"></i></a>
+                <a href="#" class="hover:text-rainbow transition"><i class="fa-solid fa-blog"></i></a>
+                <a href="#" class="hover:text-rainbow transition"><i class="fa-brands fa-telegram"></i></a>
+                <a href="#" class="hover:text-rainbow transition"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        
+        // 1. Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when link clicked
+        document.querySelectorAll('#mobileMenu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // 2. Hero Interactive Stock Simulation Chart (Chart.js)
+        let heroChart;
+        function initHeroChart() {
+            const ctx = document.getElementById('heroChart').getContext('2d');
+            
+            // Create Rainbow Gradient for Chart Fill & Line
+            const gradientFill = ctx.createLinearGradient(0, 0, 0, 250);
+            gradientFill.addColorStop(0, 'rgba(0, 230, 118, 0.35)');
+            gradientFill.addColorStop(0.5, 'rgba(0, 176, 255, 0.15)');
+            gradientFill.addColorStop(1, 'rgba(156, 39, 176, 0.0)');
+
+            const labels = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+            const dataPoints = [100, 108, 105, 118, 124, 120, 132, 129, 138, 145, 140, 158.4];
+
+            heroChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Rainbow Quant Cumulative Return (%)',
+                        data: dataPoints,
+                        borderColor: '#00e676',
+                        borderWidth: 3,
+                        backgroundColor: gradientFill,
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#00b0ff',
+                        pointBorderColor: '#ffffff',
+                        pointHoverRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#131b2e',
+                            titleColor: '#00e676',
+                            bodyColor: '#ffffff',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` 지수: ${context.parsed.y} (+${(context.parsed.y - 100).toFixed(1)}%)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#64748b', font: { size: 10 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#64748b', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        
+        // 3. MENU 03: TRADER CAREER QUIZ LOGIC
+        const quizQuestions = [
+            {
+                q: "1. 주식 매수 후 가장 먼저 확인하는 요소는 무엇인가요?",
+                a: [
+                    { text: "📊 차트 상의 보조지표 및 주요 지지/저항선", score: "technical" },
+                    { text: "🧠 과거 알고리즘 백테스팅 신호 및 수량/가격 지수", score: "quant" },
+                    { text: "⚡ 당일 호가창 잔량 및 수급 모멘텀 체결 속도", score: "scalper" },
+                    { text: "🛡️ 기업의 PER/PBR 및 분기 실적 보고서", score: "value" }
+                ]
+            },
+            {
+                q: "2. 종목 선택 시 가장 선호하는 방식은?",
+                a: [
+                    { text: "🧠 파이썬 크롤링으로 조건에 맞는 종목 자동 추출", score: "quant" },
+                    { text: "⚡ 거래량 폭발 지점 및 당일 대장주 테마 포착", score: "scalper" },
+                    { text: "📊 이동평균선 정배열 및 패턴 다이버전스 발굴", score: "technical" },
+                    { text: "🛡️ 저평가 우량주 및 배당 수익률이 높은 종목", score: "value" }
+                ]
+            },
+            {
+                q: "3. 예상과 달리 주가가 -5% 하락했을 때 당신의 행동은?",
+                a: [
+                    { text: "🧠 미리 설정한 손절 프로그램 및 룰에 따라 기계적 손절", score: "quant" },
+                    { text: "⚡ 짧은 손절 라인 초과 시 즉시 손절 후 다음 급등주 물색", score: "scalper" },
+                    { text: "📊 다음 주요 지지선까지 추세를 재검토하며 대응", score: "technical" },
+                    { text: "🛡️ 기업의 가치 변함이 없다면 추가 분할 매수(물타기/모아가기)", score: "value" }
+                ]
+            },
+            {
+                q: "4. 가장 보람을 느끼는 순간은?",
+                a: [
+                    { text: "📊 내가 그린 추세선과 지지선대로 차트가 반등했을 때", score: "technical" },
+                    { text: "🧠 몇 달간 개발한 자동매매 알고리즘이 안정적 수익을 낼 때", score: "quant" },
+                    { text: "⚡ 몇 분 만에 급등주 파동을 타고 빠른 수익을 챙겼을 때", score: "scalper" },
+                    { text: "🛡️ 장기 투자한 우량 기업의 가치가 시장에 재평가받을 때", score: "value" }
+                ]
+            },
+            {
+                q: "5. 나에게 주식 시장이란?",
+                a: [
+                    { text: "🧠 확률과 통계로 접근하는 거대한 데이터 수집 공간", score: "quant" },
+                    { text: "📊 심리와 수급이 차트라는 궤적으로 나타나는 무대", score: "technical" },
+                    { text: "⚡ 순발력과 집중력으로 승부하는 전장", score: "scalper" },
+                    { text: "🛡️ 좋은 기업과 동반 성장하는 장기 자산 배분처", score: "value" }
+                ]
+            }
+        ];
+
+        let currentQuizIndex = 0;
+        let quizScores = { technical: 0, quant: 0, scalper: 0, value: 0 };
+
+        function loadQuizQuestion() {
+            const qData = quizQuestions[currentQuizIndex];
+            document.getElementById('quizStepText').innerText = `질문 ${currentQuizIndex + 1} / ${quizQuestions.length}`;
+            const percent = ((currentQuizIndex + 1) / quizQuestions.length) * 100;
+            document.getElementById('quizPercentText').innerText = `${percent}% 완료`;
+            document.getElementById('quizProgressBar').style.width = `${percent}%`;
+
+            document.getElementById('questionTitle').innerText = qData.q;
+            
+            const answersBox = document.getElementById('quizAnswersContainer');
+            answersBox.innerHTML = '';
+
+            qData.a.forEach((ans, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-sky-500 hover:bg-slate-800/80 transition-all text-xs sm:text-sm text-slate-200 flex items-center justify-between group";
+                btn.onclick = () => answerQuiz(ans.score);
+                btn.innerHTML = `
+                    <span>${ans.text}</span>
+                    <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-sky-400 group-hover:translate-x-1 transition-transform"></i>
+                `;
+                answersBox.appendChild(btn);
+            });
+        }
+
+        function answerQuiz(type) {
+            quizScores[type]++;
+            currentQuizIndex++;
+
+            if (currentQuizIndex < quizQuestions.length) {
+                loadQuizQuestion();
+            } else {
+                showQuizResult();
+            }
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizQuestionBox').classList.add('hidden');
+            document.getElementById('quizProgressContainer').classList.add('hidden');
+            document.getElementById('quizResultBox').classList.remove('hidden');
+
+            // Find highest score key
+            let highestType = 'quant';
+            let maxVal = -1;
+            for (const [key, val] of Object.entries(quizScores)) {
+                if (val > maxVal) {
+                    maxVal = val;
+                    highestType = key;
+                }
+            }
+
+            const resultProfiles = {
+                quant: {
+                    title: "🧠 냉철한 수학자 - 퀀트/알고리즘 트레이더",
+                    desc: "당신은 감정을 철저히 배제하고 데이터, 통계 백테스팅, 수식 알고리즘을 최우선으로 신뢰합니다. 규칙 기반의 정밀 매매 시스템을 구축하기에 최적화된 귀중한 인재입니다!",
+                    icon: "fa-brain text-sky-400",
+                    roadmap: "Python 데이터분석 + Backtrader + 팩터 자산배분 모델",
+                    strength: "기계적인 손절매 준수 & 리스크 관리 우수"
+                },
+                technical: {
+                    title: "📊 차트의 연금술사 - 기술적 스윙 트레이더",
+                    desc: "당신은 캔들 패턴, 추세선, 다이버전스 등 시장의 수급 흐름을 시각적으로 포착하는 감각이 탁월합니다. 지지와 저항을 활용한 스윙 타격 매매에 강점을 지닙니다!",
+                    icon: "fa-chart-line text-emerald-400",
+                    roadmap: "이동평균선 다이버전스 + 보조지표 복합 파동 이론 + 세력 수급 분석",
+                    strength: "상승 전환 모멘텀 발굴 & 차트 패턴 포착력"
+                },
+                scalper: {
+                    title: "⚡ 번개 같은 순발력 - 데이 & 단타 스캘퍼",
+                    desc: "당신은 당일 호가창 체결 속도와 대장주 테마 수급의 순간 파동을 집요하게 노리는 스캘핑 트레이더 성향입니다! 신속한 판단력과 뛰어난 몰입도를 갖추고 있습니다.",
+                    icon: "fa-bolt text-amber-400",
+                    roadmap: "호가창 체결 강도 분석 + 당일 거래대금 스크리닝 + 초단기 리스크 관리",
+                    strength: "빠른 회전율 & 과감한 즉각 대응력"
+                },
+                value: {
+                    title: "🛡️ 든든한 요새 - 가치 & 장기 자산배분가",
+                    desc: "당신은 기업의 본질적 가치와 재무제표를 바탕으로 단기 파동에 흔들리지 않는 굳건한 투자 철학을 지녔습니다. 훌륭한 복리 성장의 수혜자가 될 자질이 충분합니다!",
+                    icon: "fa-shield-halved text-purple-400",
+                    roadmap: "재무제표 펀더멘털 분석 + 올웨더 자산배분 + 배당 재투자 전략",
+                    strength: "높은 멘탈 방어력 & 복리 투자 추구"
+                }
+            };
+
+            const prof = resultProfiles[highestType];
+            document.getElementById('resultTitle').innerText = prof.title;
+            document.getElementById('resultDesc').innerText = prof.desc;
+            document.getElementById('resultIcon').className = `fa-solid ${prof.icon} text-4xl`;
+            document.getElementById('resultRoadmap').innerText = prof.roadmap;
+            document.getElementById('resultStrength').innerText = prof.strength;
+
+            // Store result for guestbook tag auto-prefill
+            window.userQuizResultTag = prof.title.split('-')[1]?.trim() || prof.title;
+        }
+
+        function resetQuiz() {
+            currentQuizIndex = 0;
+            quizScores = { technical: 0, quant: 0, scalper: 0, value: 0 };
+            document.getElementById('quizQuestionBox').classList.remove('hidden');
+            document.getElementById('quizProgressContainer').classList.remove('hidden');
+            document.getElementById('quizResultBox').classList.add('hidden');
+            loadQuizQuestion();
+        }
+
+        function prefillGuestbookTag() {
+            if (window.userQuizResultTag) {
+                const select = document.getElementById('gbTag');
+                select.value = window.userQuizResultTag;
+            }
+        }
+
+        
+        // 4. MENU 04: GUESTBOOK LOGIC WITH LOCALSTORAGE
+        let selectedAvatarEmoji = '🚀';
+
+        function selectAvatar(emoji) {
+            selectedAvatarEmoji = emoji;
+            document.querySelectorAll('.avatar-btn').forEach(btn => {
+                if(btn.innerText === emoji) {
+                    btn.classList.add('border-purple-500');
+                    btn.classList.remove('border-slate-800');
+                } else {
+                    btn.classList.remove('border-purple-500');
+                    btn.classList.add('border-slate-800');
+                }
+            });
+        }
+
+        // Pre-loaded initial guestbook entries
+        const initialGuestbookData = [
+            {
+                id: 1,
+                name: "김차트",
+                avatar: "📈",
+                tag: "📊 차트 스윙 트레이더",
+                message: "퀀트 백테스팅 지표가 인상적이네요! RainbowQuant 전략 손절 라인 잡는 노하우가 궁금합니다.",
+                date: "2026.08.25",
+                likes: 5
+            },
+            {
+                id: 2,
+                name: "알고마스터",
+                avatar: "🤖",
+                tag: "🧠 퀀트/알고리즘",
+                message: "트레이더 진로 퀴즈 풀었는데 퀀트 트레이더 나왔네요! 포트폴리오 깔끔하고 멋집니다. 자주 방문할게요.",
+                date: "2026.08.26",
+                likes: 8
+            },
+            {
+                id: 3,
+                name: "성투요정",
+                avatar: "🚀",
+                tag: "⚡ 단타 스캘퍼",
+                message: "SentiStock 뉴스 감성 스크리너 신기하네요! 성투하세요!",
+                date: "2026.08.27",
+                likes: 3
+            }
+        ];
+
+        function getStoredGuestbook() {
+            const data = localStorage.getItem('rainbow_trader_guestbook');
+            if (data) {
+                try { return JSON.parse(data); } catch(e) { return initialGuestbookData; }
+            }
+            localStorage.setItem('rainbow_trader_guestbook', JSON.stringify(initialGuestbookData));
+            return initialGuestbookData;
+        }
+
+        function saveGuestbook(arr) {
+            localStorage.setItem('rainbow_trader_guestbook', JSON.stringify(arr));
+            renderGuestbook();
+        }
+
+        function handleGuestbookSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('gbName').value.trim();
+            const tag = document.getElementById('gbTag').value;
+            const message = document.getElementById('gbMessage').value.trim();
+
+            if (!name || !message) return;
+
+            const newEntry = {
+                id: Date.now(),
+                name: name,
+                avatar: selectedAvatarEmoji,
+                tag: tag,
+                message: message,
+                date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+                likes: 0
+            };
+
+            const currentList = getStoredGuestbook();
+            currentList.unshift(newEntry);
+            saveGuestbook(currentList);
+
+            document.getElementById('gbForm')?.reset();
+            document.getElementById('gbName').value = '';
+            document.getElementById('gbMessage').value = '';
+        }
+
+        function renderGuestbook() {
+            const listContainer = document.getElementById('guestbookList');
+            const data = getStoredGuestbook();
+            
+            document.getElementById('totalGbCount').innerText = data.length;
+
+            if (data.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-8 text-xs text-slate-500">첫 방명록을 작성해보세요!</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = '';
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "p-5 rounded-2xl bg-cardBg border border-slate-800 space-y-3 hover:border-slate-700 transition";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-xl">${item.avatar}</span>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-bold text-slate-100">${item.name}</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-purple-400 font-medium">${item.tag}</span>
+                                </div>
+                                <span class="text-[10px] text-slate-500 font-mono">${item.date}</span>
+                            </div>
+                        </div>
+                        <button onclick="likeGuestbook(${item.id})" class="px-3 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-400 hover:text-pink-400 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-heart text-pink-500"></i>
+                            <span class="font-bold">${item.likes}</span>
+                        </button>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-slate-900">${item.message}</p>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        function likeGuestbook(id) {
+            const data = getStoredGuestbook();
+            const target = data.find(item => item.id === id);
+            if (target) {
+                target.likes++;
+                saveGuestbook(data);
+            }
+        }
+
+        function sortGuestbook(type) {
+            const data = getStoredGuestbook();
+            if (type === 'newest') {
+                data.sort((a,b) => b.id - a.id);
+            } else if (type === 'likes') {
+                data.sort((a,b) => b.likes - a.likes);
+            }
+            saveGuestbook(data);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Initialize App on Window Load
+        window.onload = function() {
+            initHeroChart();
+            loadQuizQuestion();
+            renderGuestbook();
+        };
+    </script>
+</body>
+</html>
